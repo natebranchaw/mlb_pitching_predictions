@@ -2,7 +2,7 @@ MLB Pitching Predictions - Machine Learning Approach
 
 I am predicting MLB pitching stats utilizing Statcast and traditional statistics
 
-A full definition of statistics included in my analysis is listed below
+A full definition of statistics included in my analysis is listed below <br />
 PlayerName - 
 playerid
 Date
