@@ -12,7 +12,7 @@ season
 Team
 HomeAway
 Age
-W - number of wins
+W - number of wins  
 L - number of losses
 ERA - average number of earned runs a pitcher allows per 9 innings
 G - number of games in which the pitcher appeared
