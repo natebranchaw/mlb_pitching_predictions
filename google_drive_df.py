@@ -7,7 +7,7 @@ def get_google_drive_df(file_link):
     gauth = GoogleAuth()
     
     #Try to load saved client credentials
-    gauth.LoadCredentialsFile('client_secrets.json')
+    gauth.LoadCredentialsFile('settings.yaml')
     
     if gauth.credentials is None:
         #Authenticate if they're not there
