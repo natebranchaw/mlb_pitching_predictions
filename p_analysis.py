@@ -34,10 +34,12 @@ null_values['% Missing'] = null_values['Missing Values'] / statcast_data.shape[0
 under50 = null_values[null_values['% Missing'] > 0.5].index
 
 #Create a list of all columns with more than 50% of its data being missing
-under50 = under50.to_list()
+#under50 = under50.to_list()
 
 #Remove the columns with more than 50% of its data missing from the original dataframe. I will create a copy to retain the original information
-cleaned_statcast_data = statcast_data.drop(under50, axis = 1).copy()
+#cleaned_statcast_data = statcast_data.drop(under50, axis = 1).copy()
+cleaned_statcast_data = statcast_data.copy()
+
 
 #This now leaves me with 211 features vs 302 that I started with
 #Now I want to look at any statistics that would not be available to me before a game has started. I want to remove all of these except for PO
@@ -62,6 +64,9 @@ cleaned_statcast_data['Season_W'] = cleaned_statcast_data.groupby(['playerid', '
 #I want to apply the same logic to the rest of the statistics in my dataset
 cleaned_statcast_data['Season_L'] = cleaned_statcast_data.groupby(['playerid', 'season'])['L'].cumsum()
 cleaned_statcast_data['Season_L'] = cleaned_statcast_data.groupby(['playerid', 'season'])['Season_L'].shift(1, fill_value = 0)
+
+cleaned_statcast_data['Season_G'] = cleaned_statcast_data.groupby(['playerid', 'season'])['G'].cumsum()
+cleaned_statcast_data['Season_G'] = cleaned_statcast_data.groupby(['playerid', 'season'])['Season_G'].shift(1, fill_value = 0)
 
 cleaned_statcast_data['Season_QS'] = cleaned_statcast_data.groupby(['playerid', 'season'])['QS'].cumsum()
 cleaned_statcast_data['Season_QS'] = cleaned_statcast_data.groupby(['playerid', 'season'])['Season_QS'].shift(1, fill_value = 0)
@@ -162,6 +167,56 @@ cleaned_statcast_data['Season_Hard'] = cleaned_statcast_data.groupby(['playerid'
 cleaned_statcast_data['Season_bipCount'] = cleaned_statcast_data.groupby(['playerid', 'season'])['bipCount'].cumsum()
 cleaned_statcast_data['Season_bipCount'] = cleaned_statcast_data.groupby(['playerid', 'season'])['Season_bipCount'].shift(1, fill_value = 0)
 
+#RS(Run Support): Number of runs the pitcher’s team has scored during their appearances
+cleaned_statcast_data['Season_RS'] = cleaned_statcast_data.groupby(['playerid', 'season'])['RS'].cumsum()
+cleaned_statcast_data['Season_RS'] = cleaned_statcast_data.groupby(['playerid', 'season'])['Season_RS'].shift(1, fill_value = 0)
+
+#pLI The average leverage index of each pitcher’s batters faced
+cleaned_statcast_data['Season_pLI'] = cleaned_statcast_data.groupby(['playerid', 'season'])['pLI'].cumsum()
+cleaned_statcast_data['Season_pLI'] = cleaned_statcast_data.groupby(['playerid', 'season'])['Season_pLI'].shift(1, fill_value = 0)
+cleaned_statcast_data['Season_pLI'] = (cleaned_statcast_data['Season_pLI'] / cleaned_statcast_data['Season_G']).fillna(0)
+
+#inLI The average leverage index at the beginning of the inning for the pitcher
+cleaned_statcast_data['Season_inLI'] = cleaned_statcast_data.groupby(['playerid', 'season'])['inLI'].cumsum()
+cleaned_statcast_data['Season_inLI'] = cleaned_statcast_data.groupby(['playerid', 'season'])['Season_inLI'].shift(1, fill_value = 0)
+cleaned_statcast_data['Season_inLI'] = (cleaned_statcast_data['Season_inLI'] / cleaned_statcast_data['Season_G']).fillna(0)
+
+#gmLI The average leverage index at the beginning of the game for the pitcher
+cleaned_statcast_data['Season_gmLI'] = cleaned_statcast_data.groupby(['playerid', 'season'])['gmLI'].cumsum()
+cleaned_statcast_data['Season_gmLI'] = cleaned_statcast_data.groupby(['playerid', 'season'])['Season_gmLI'].shift(1, fill_value = 0)
+cleaned_statcast_data['Season_gmLI'] = (cleaned_statcast_data['Season_gmLI'] / cleaned_statcast_data['Season_G']).fillna(0)
+
+#exLI The average leverage index at the end of the appearance for the pitcher
+cleaned_statcast_data['Season_exLI'] = cleaned_statcast_data.groupby(['playerid', 'season'])['exLI'].cumsum()
+cleaned_statcast_data['Season_exLI'] = cleaned_statcast_data.groupby(['playerid', 'season'])['Season_exLI'].shift(1, fill_value = 0)
+cleaned_statcast_data['Season_exLI'] = (cleaned_statcast_data['Season_exLI'] / cleaned_statcast_data['Season_G']).fillna(0)
+
+#Based on percentages calculate how many of each pitch type were thrown in the given game
+cleaned_statcast_data['Fastballs'] = round((cleaned_statcast_data['FB%1'] * cleaned_statcast_data['Pitches']).fillna(0),0)
+cleaned_statcast_data['Curveballs'] = round((cleaned_statcast_data['CB%'] * cleaned_statcast_data['Pitches']).fillna(0),0)
+cleaned_statcast_data['ChangeUps'] = round((cleaned_statcast_data['CH%'] * cleaned_statcast_data['Pitches']).fillna(0),0)
+cleaned_statcast_data['Sliders'] = round((cleaned_statcast_data['SL%'] * cleaned_statcast_data['Pitches']).fillna(0),0)
+cleaned_statcast_data['Cutters'] = round((cleaned_statcast_data['CT%'] * cleaned_statcast_data['Pitches']).fillna(0),0)
+cleaned_statcast_data['SplitF'] = round((cleaned_statcast_data['SF%'] * cleaned_statcast_data['Pitches']).fillna(0),0)
+cleaned_statcast_data['KnuckleCurve'] = round((cleaned_statcast_data['KN%'] * cleaned_statcast_data['Pitches']).fillna(0),0)
+cleaned_statcast_data['UnknownPitch'] = round((cleaned_statcast_data['XX%'] * cleaned_statcast_data['Pitches']).fillna(0),0)
+
+#Calculate Season rates for each pitch type
+cleaned_statcast_data['Season_Fastballs'] = cleaned_statcast_data.groupby(['playerid', 'season'])['Fastballs'].cumsum()
+cleaned_statcast_data['Season_Fastballs'] = cleaned_statcast_data.groupby(['playerid', 'season'])['Season_Fastballs'].shift(1, fill_value = 0)
+cleaned_statcast_data['Season_FB%'] = (cleaned_statcast_data['Season_Fastballs'] / cleaned_statcast_data['Season_Pitches']).fillna(0)
+
+
+
+
+
+
+
+
+
+
+
+
 #Create Season stats for all calculated statistics
 
 #Baseball stats use 6.1 to represent 6-1/3 innings pitched and 6.2 represents 6-2/3 innings pitched. I need to convert these values to 
@@ -197,14 +252,59 @@ cleaned_statcast_data['Season_HR/9'] = ((cleaned_statcast_data['Season_HR'] * 9)
 cleaned_statcast_data['Season_K/BB'] = np.where((cleaned_statcast_data['Season_BB'] + cleaned_statcast_data['Season_IBB']) == 0, cleaned_statcast_data['Season_SO'],
                                                 (cleaned_statcast_data['Season_SO'] / (cleaned_statcast_data['Season_BB'] + cleaned_statcast_data['Season_IBB'])))
 
+#WHIP is calculated as the number of walks plus hits divided by innings pitched
 cleaned_statcast_data['Season_WHIP'] = ((cleaned_statcast_data['Season_BB'] + cleaned_statcast_data['Season_IBB'] + cleaned_statcast_data['Season_H']) / (cleaned_statcast_data['Season_PO'] / 3)).fillna(0)
+
+cleaned_statcast_data['Season_AVG'] = (cleaned_statcast_data['H'] / (cleaned_statcast_data['Season_TBF'] - (cleaned_statcast_data['Season_BB'] + cleaned_statcast_data['Season_IBB'])))
+#cleaned_statcast_data['Season_AVG'] = cleaned_statcast_data['Season_AVG'].replace(np.inf, 0)
+
+cleaned_statcast_data['Season_BABIP'] = (cleaned_statcast_data['Season_H'] / cleaned_statcast_data['Season_bipCount']).fillna(0)
+
+cleaned_statcast_data['Season_K%'] = (cleaned_statcast_data['Season_SO'] / cleaned_statcast_data['Season_TBF']).fillna(0)
+
+cleaned_statcast_data['Season_BB%'] = ((cleaned_statcast_data['Season_BB'] + cleaned_statcast_data['Season_IBB']) / cleaned_statcast_data['Season_TBF']).fillna(0)
+
+cleaned_statcast_data['Season_K-BB%'] = cleaned_statcast_data['Season_K%'] - cleaned_statcast_data['Season_BB%']
+
+#Using the formula from fangraphs https://library.fangraphs.com/pitching/lob/
+cleaned_statcast_data['Season_LOB%'] = ((cleaned_statcast_data['Season_H'] + cleaned_statcast_data['Season_BB'] + cleaned_statcast_data['Season_IBB']+ cleaned_statcast_data['Season_HBP'] - cleaned_statcast_data['Season_R']) / ((cleaned_statcast_data['Season_H'] + cleaned_statcast_data['Season_BB'] + cleaned_statcast_data['Season_IBB']+ cleaned_statcast_data['Season_HBP']) - (1.4 * cleaned_statcast_data['Season_HR']))).fillna(0)
+
+cleaned_statcast_data['Season_GB/FB'] = (cleaned_statcast_data['Season_GB'] / cleaned_statcast_data['Season_FB']).fillna(0)
+
+#IFH% is the percentage of ground balls that are infield hits, calculated as IFG/GB
+cleaned_statcast_data['Season_IFH%'] = (cleaned_statcast_data['Season_IFH'] / cleaned_statcast_data['Season_GB']).fillna(0)
+
+#BUH% percentage of bunts that go for hits, calculated as bunt hits / bunts
+cleaned_statcast_data['Season_BUH%'] = (cleaned_statcast_data['Season_BUH'] / cleaned_statcast_data['Season_BU']).fillna(0)
+
+#LD% percentage of batter's balls in play that are line drives calculated as LD/BIP
+cleaned_statcast_data['Season_LD%'] = (cleaned_statcast_data['Season_LD'] / cleaned_statcast_data['Season_bipCount']).fillna(0)
+
+#GB% percentage of batter's balls in play that are ground balls calculated as GB/BIP
+cleaned_statcast_data['Season_GB%'] = (cleaned_statcast_data['Season_GB'] / cleaned_statcast_data['Season_bipCount']).fillna(0)
+
+#FB% percentage of batter's balls in play that are fly balls calculated as FB/BIP
+cleaned_statcast_data['Season_FB%'] = (cleaned_statcast_data['Season_FB'] / cleaned_statcast_data['Season_bipCount']).fillna(0)
+
+#IFFB% percentage of batter's balls in play that are infield fly balls calculated as IFFB/BIP
+cleaned_statcast_data['Season_IFFB%'] = (cleaned_statcast_data['Season_IFFB'] / cleaned_statcast_data['Season_FB']).fillna(0)
+
+#HR/FB (Home Run to Fly Ball Rate): Percentage of a batter’s fly balls that go for home runs, calculated as HB/FB (even though some HR are line drives).
+cleaned_statcast_data['Season_HR/FB'] = (cleaned_statcast_data['Season_HR'] / cleaned_statcast_data['Season_FB']).fillna(0)
+
+#RS/9 (Run Support per 9 innings): Number of runs the pitcher’s team has scored during their appearances per 9 innings
+cleaned_statcast_data['Season_RS/9'] = (9 * (cleaned_statcast_data['Season_RS'] / (cleaned_statcast_data['Season_PO'] / 3))).fillna(0)
+
+
+
+
 
 
 
 
 
 #Check to make sure the Season Wins are calculating correctly
-cols_to_check = ['PlayerName', 'playerid', 'Date', 'season', 'Season_R', 'Season_IP', 'Season_SO', 'Season_WHIP']
+cols_to_check = ['PlayerName', 'playerid', 'Date', 'Season_Fastballs', 'Season_Pitches', 'Season_FB%']
 checking_W = cleaned_statcast_data[cols_to_check]
 checking_W = checking_W[checking_W['playerid'] == 2036]
 
