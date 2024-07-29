@@ -206,15 +206,33 @@ cleaned_statcast_data['Season_Fastballs'] = cleaned_statcast_data.groupby(['play
 cleaned_statcast_data['Season_Fastballs'] = cleaned_statcast_data.groupby(['playerid', 'season'])['Season_Fastballs'].shift(1, fill_value = 0)
 cleaned_statcast_data['Season_FB%'] = (cleaned_statcast_data['Season_Fastballs'] / cleaned_statcast_data['Season_Pitches']).fillna(0)
 
+cleaned_statcast_data['Season_Curveballs'] = cleaned_statcast_data.groupby(['playerid', 'season'])['Curveballs'].cumsum()
+cleaned_statcast_data['Season_Curveballs'] = cleaned_statcast_data.groupby(['playerid', 'season'])['Season_Curveballs'].shift(1, fill_value = 0)
+cleaned_statcast_data['Season_CB%'] = (cleaned_statcast_data['Season_Curveballs'] / cleaned_statcast_data['Season_Pitches']).fillna(0)
 
+cleaned_statcast_data['Season_Changeups'] = cleaned_statcast_data.groupby(['playerid', 'season'])['Changeups'].cumsum()
+cleaned_statcast_data['Season_Changeups'] = cleaned_statcast_data.groupby(['playerid', 'season'])['Season_Changeups'].shift(1, fill_value = 0)
+cleaned_statcast_data['Season_CH%'] = (cleaned_statcast_data['Season_Changeups'] / cleaned_statcast_data['Season_Pitches']).fillna(0)
 
+cleaned_statcast_data['Season_Sliders'] = cleaned_statcast_data.groupby(['playerid', 'season'])['Sliders'].cumsum()
+cleaned_statcast_data['Season_Sliders'] = cleaned_statcast_data.groupby(['playerid', 'season'])['Season_Sliders'].shift(1, fill_value = 0)
+cleaned_statcast_data['Season_SL%'] = (cleaned_statcast_data['Season_Sliders'] / cleaned_statcast_data['Season_Pitches']).fillna(0)
 
+cleaned_statcast_data['Season_Cutters'] = cleaned_statcast_data.groupby(['playerid', 'season'])['Cutters'].cumsum()
+cleaned_statcast_data['Season_Cutters'] = cleaned_statcast_data.groupby(['playerid', 'season'])['Season_Cutters'].shift(1, fill_value = 0)
+cleaned_statcast_data['Season_CT%'] = (cleaned_statcast_data['Season_Cutters'] / cleaned_statcast_data['Season_Pitches']).fillna(0)
 
+cleaned_statcast_data['Season_SplitF'] = cleaned_statcast_data.groupby(['playerid', 'season'])['SplitF'].cumsum()
+cleaned_statcast_data['Season_SplitF'] = cleaned_statcast_data.groupby(['playerid', 'season'])['Season_SplitF'].shift(1, fill_value = 0)
+cleaned_statcast_data['Season_SF%'] = (cleaned_statcast_data['Season_SplitF'] / cleaned_statcast_data['Season_Pitches']).fillna(0)
 
+cleaned_statcast_data['Season_KnuckleCurve'] = cleaned_statcast_data.groupby(['playerid', 'season'])['KnuckleCurve'].cumsum()
+cleaned_statcast_data['Season_KnuckleCurve'] = cleaned_statcast_data.groupby(['playerid', 'season'])['Season_KnuckleCurve'].shift(1, fill_value = 0)
+cleaned_statcast_data['Season_KN%'] = (cleaned_statcast_data['Season_KnuckleCurve'] / cleaned_statcast_data['Season_Pitches']).fillna(0)
 
-
-
-
+cleaned_statcast_data['Season_UnknownPitch'] = cleaned_statcast_data.groupby(['playerid', 'season'])['UnknownPitch'].cumsum()
+cleaned_statcast_data['Season_UnknownPitch'] = cleaned_statcast_data.groupby(['playerid', 'season'])['Season_UnknownPitch'].shift(1, fill_value = 0)
+cleaned_statcast_data['Season_XX%'] = (cleaned_statcast_data['Season_UnknownPitch'] / cleaned_statcast_data['Season_Pitches']).fillna(0)
 
 
 #Create Season stats for all calculated statistics
@@ -304,7 +322,7 @@ cleaned_statcast_data['Season_RS/9'] = (9 * (cleaned_statcast_data['Season_RS'] 
 
 
 #Check to make sure the Season Wins are calculating correctly
-cols_to_check = ['PlayerName', 'playerid', 'Date', 'Season_Fastballs', 'Season_Pitches', 'Season_FB%']
+cols_to_check = ['PlayerName', 'playerid', 'Date', 'Season_FBv', 'FBv', 'Season_G']
 checking_W = cleaned_statcast_data[cols_to_check]
 checking_W = checking_W[checking_W['playerid'] == 2036]
 
