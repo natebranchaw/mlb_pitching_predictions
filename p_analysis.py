@@ -210,9 +210,9 @@ cleaned_statcast_data['Season_Curveballs'] = cleaned_statcast_data.groupby(['pla
 cleaned_statcast_data['Season_Curveballs'] = cleaned_statcast_data.groupby(['playerid', 'season'])['Season_Curveballs'].shift(1, fill_value = 0)
 cleaned_statcast_data['Season_CB%'] = (cleaned_statcast_data['Season_Curveballs'] / cleaned_statcast_data['Season_Pitches']).fillna(0)
 
-cleaned_statcast_data['Season_Changeups'] = cleaned_statcast_data.groupby(['playerid', 'season'])['Changeups'].cumsum()
-cleaned_statcast_data['Season_Changeups'] = cleaned_statcast_data.groupby(['playerid', 'season'])['Season_Changeups'].shift(1, fill_value = 0)
-cleaned_statcast_data['Season_CH%'] = (cleaned_statcast_data['Season_Changeups'] / cleaned_statcast_data['Season_Pitches']).fillna(0)
+cleaned_statcast_data['Season_ChangeUps'] = cleaned_statcast_data.groupby(['playerid', 'season'])['ChangeUps'].cumsum()
+cleaned_statcast_data['Season_ChangeUps'] = cleaned_statcast_data.groupby(['playerid', 'season'])['Season_ChangeUps'].shift(1, fill_value = 0)
+cleaned_statcast_data['Season_CH%'] = (cleaned_statcast_data['Season_ChangeUps'] / cleaned_statcast_data['Season_Pitches']).fillna(0)
 
 cleaned_statcast_data['Season_Sliders'] = cleaned_statcast_data.groupby(['playerid', 'season'])['Sliders'].cumsum()
 cleaned_statcast_data['Season_Sliders'] = cleaned_statcast_data.groupby(['playerid', 'season'])['Season_Sliders'].shift(1, fill_value = 0)
@@ -234,6 +234,17 @@ cleaned_statcast_data['Season_UnknownPitch'] = cleaned_statcast_data.groupby(['p
 cleaned_statcast_data['Season_UnknownPitch'] = cleaned_statcast_data.groupby(['playerid', 'season'])['Season_UnknownPitch'].shift(1, fill_value = 0)
 cleaned_statcast_data['Season_XX%'] = (cleaned_statcast_data['Season_UnknownPitch'] / cleaned_statcast_data['Season_Pitches']).fillna(0)
 
+cleaned_statcast_data['Season_Events'] = cleaned_statcast_data.groupby(['playerid', 'season'])['Events'].cumsum()
+cleaned_statcast_data['Season_Events'] = cleaned_statcast_data.groupby(['playerid', 'season'])['Season_Events'].shift(1, fill_value = 0)
+
+cleaned_statcast_data['Season_Barrels'] = cleaned_statcast_data.groupby(['playerid', 'season'])['Barrels'].cumsum()
+cleaned_statcast_data['Season_Barrels'] = cleaned_statcast_data.groupby(['playerid', 'season'])['Season_Barrels'].shift(1, fill_value = 0)
+
+cleaned_statcast_data['Season_HardHit'] = cleaned_statcast_data.groupby(['playerid', 'season'])['HardHit'].cumsum()
+cleaned_statcast_data['Season_HardHit'] = cleaned_statcast_data.groupby(['playerid', 'season'])['Season_HardHit'].shift(1, fill_value = 0)
+
+cleaned_statcast_data['Season_Barrel%'] = (cleaned_statcast_data['Season_Barrels'] / cleaned_statcast_data['Season_Events']).fillna(0)
+cleaned_statcast_data['Season_HardHit%'] = (cleaned_statcast_data['Season_HardHit'] / cleaned_statcast_data['Season_Events']).fillna(0)
 
 #Create Season stats for all calculated statistics
 
@@ -282,7 +293,7 @@ cleaned_statcast_data['Season_K%'] = (cleaned_statcast_data['Season_SO'] / clean
 
 cleaned_statcast_data['Season_BB%'] = ((cleaned_statcast_data['Season_BB'] + cleaned_statcast_data['Season_IBB']) / cleaned_statcast_data['Season_TBF']).fillna(0)
 
-cleaned_statcast_data['Season_K-BB%'] = cleaned_statcast_data['Season_K%'] - cleaned_statcast_data['Season_BB%']
+cleaned_statcast_data['Season_K-BB%'] = (cleaned_statcast_data['Season_K%'] - cleaned_statcast_data['Season_BB%']).fillna(0)
 
 #Using the formula from fangraphs https://library.fangraphs.com/pitching/lob/
 cleaned_statcast_data['Season_LOB%'] = ((cleaned_statcast_data['Season_H'] + cleaned_statcast_data['Season_BB'] + cleaned_statcast_data['Season_IBB']+ cleaned_statcast_data['Season_HBP'] - cleaned_statcast_data['Season_R']) / ((cleaned_statcast_data['Season_H'] + cleaned_statcast_data['Season_BB'] + cleaned_statcast_data['Season_IBB']+ cleaned_statcast_data['Season_HBP']) - (1.4 * cleaned_statcast_data['Season_HR']))).fillna(0)
@@ -313,16 +324,19 @@ cleaned_statcast_data['Season_HR/FB'] = (cleaned_statcast_data['Season_HR'] / cl
 #RS/9 (Run Support per 9 innings): Number of runs the pitcher’s team has scored during their appearances per 9 innings
 cleaned_statcast_data['Season_RS/9'] = (9 * (cleaned_statcast_data['Season_RS'] / (cleaned_statcast_data['Season_PO'] / 3))).fillna(0)
 
-
-
-
+cleaned_statcast_data['Season_Pull%'] = (cleaned_statcast_data['Season_Pull'] / cleaned_statcast_data['Season_bipCount']).fillna(0)
+cleaned_statcast_data['Season_Cent%'] = (cleaned_statcast_data['Season_Cent'] / cleaned_statcast_data['Season_bipCount']).fillna(0)
+cleaned_statcast_data['Season_Oppo%'] = (cleaned_statcast_data['Season_Oppo'] / cleaned_statcast_data['Season_bipCount']).fillna(0)
+cleaned_statcast_data['Season_Soft%'] = (cleaned_statcast_data['Season_Soft'] / cleaned_statcast_data['Season_bipCount']).fillna(0)
+cleaned_statcast_data['Season_Med%'] = (cleaned_statcast_data['Season_Med'] / cleaned_statcast_data['Season_bipCount']).fillna(0)
+cleaned_statcast_data['Season_Hard%'] = (cleaned_statcast_data['Season_Hard'] / cleaned_statcast_data['Season_bipCount']).fillna(0)
 
 
 
 
 
 #Check to make sure the Season Wins are calculating correctly
-cols_to_check = ['PlayerName', 'playerid', 'Date', 'Season_FBv', 'FBv', 'Season_G']
+cols_to_check = ['PlayerName', 'playerid', 'Date', 'Pull', 'bipCount', 'Season_Pull', 'Season_bipCount', 'Season_Pull%']
 checking_W = cleaned_statcast_data[cols_to_check]
 checking_W = checking_W[checking_W['playerid'] == 2036]
 
