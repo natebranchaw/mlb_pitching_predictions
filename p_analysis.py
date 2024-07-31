@@ -201,6 +201,67 @@ cleaned_statcast_data['SplitF'] = round((cleaned_statcast_data['SF%'] * cleaned_
 cleaned_statcast_data['KnuckleCurve'] = round((cleaned_statcast_data['KN%'] * cleaned_statcast_data['Pitches']).fillna(0),0)
 cleaned_statcast_data['UnknownPitch'] = round((cleaned_statcast_data['XX%'] * cleaned_statcast_data['Pitches']).fillna(0),0)
 
+#Based on percentages calculate plate discipline data
+cleaned_statcast_data['Swings'] = round((cleaned_statcast_data['Swing%'] * cleaned_statcast_data['Pitches']).fillna(0),0)
+cleaned_statcast_data['Contact'] = round((cleaned_statcast_data['Contact%'] * cleaned_statcast_data['Swings']).fillna(0),0)
+cleaned_statcast_data['InZone'] = round((cleaned_statcast_data['Zone%'] * cleaned_statcast_data['Pitches']).fillna(0),0)
+cleaned_statcast_data['SwingingStrikes'] = round((cleaned_statcast_data['SwStr%'] * cleaned_statcast_data['Pitches']).fillna(0),0)
+cleaned_statcast_data['OutZone'] = cleaned_statcast_data['Pitches'] - cleaned_statcast_data['InZone']
+
+cleaned_statcast_data['O-Swing'] = round((cleaned_statcast_data['O-Swing%'] * cleaned_statcast_data['OutZone']).fillna(0),0)
+cleaned_statcast_data['Z-Swing'] = round((cleaned_statcast_data['Z-Swing%'] * cleaned_statcast_data['InZone']).fillna(0),0)
+cleaned_statcast_data['O-Contact'] = round((cleaned_statcast_data['O-Contact%'] * cleaned_statcast_data['O-Swing']).fillna(0),0)
+cleaned_statcast_data['Z-Contact'] = round((cleaned_statcast_data['Z-Contact%'] * cleaned_statcast_data['Z-Swing']).fillna(0),0)
+cleaned_statcast_data['F-Strike'] = round((cleaned_statcast_data['F-Strike%'] * cleaned_statcast_data['TBF']).fillna(0), 0)
+
+#Calculate Season statistics for plate discipline
+cleaned_statcast_data['Season_Swings'] = cleaned_statcast_data.groupby(['playerid', 'season'])['Swings'].cumsum()
+cleaned_statcast_data['Season_Swings'] = cleaned_statcast_data.groupby(['playerid', 'season'])['Season_Swings'].shift(1, fill_value = 0)
+cleaned_statcast_data['Season_Swing%'] = (cleaned_statcast_data['Season_Swings'] / cleaned_statcast_data['Season_Pitches']).fillna(0)
+
+#Contact Percentage Contact made divided by swings
+cleaned_statcast_data['Season_Contact'] = cleaned_statcast_data.groupby(['playerid', 'season'])['Contact'].cumsum()
+cleaned_statcast_data['Season_Contact'] = cleaned_statcast_data.groupby(['playerid', 'season'])['Season_Contact'].shift(1, fill_value = 0)
+cleaned_statcast_data['Season_Contact%'] = (cleaned_statcast_data['Season_Contact'] / cleaned_statcast_data['Season_Swings']).fillna(0)
+
+cleaned_statcast_data['Season_InZone'] = cleaned_statcast_data.groupby(['playerid', 'season'])['InZone'].cumsum()
+cleaned_statcast_data['Season_InZone'] = cleaned_statcast_data.groupby(['playerid', 'season'])['Season_InZone'].shift(1, fill_value = 0)
+cleaned_statcast_data['Season_InZone%'] = (cleaned_statcast_data['Season_InZone'] / cleaned_statcast_data['Season_Pitches']).fillna(0)
+
+#Swinging Strike Percentage Swinging strikes divided by total pitches
+cleaned_statcast_data['Season_SwingingStrikes'] = cleaned_statcast_data.groupby(['playerid', 'season'])['SwingingStrikes'].cumsum()
+cleaned_statcast_data['Season_SwingingStrikes'] = cleaned_statcast_data.groupby(['playerid', 'season'])['Season_SwingingStrikes'].shift(1, fill_value = 0)
+cleaned_statcast_data['Season_SwingingStrike%'] = (cleaned_statcast_data['Season_SwingingStrikes'] / cleaned_statcast_data['Season_Pitches']).fillna(0)
+
+cleaned_statcast_data['Season_OutZone'] = cleaned_statcast_data.groupby(['playerid', 'season'])['OutZone'].cumsum()
+cleaned_statcast_data['Season_OutZone'] = cleaned_statcast_data.groupby(['playerid', 'season'])['Season_OutZone'].shift(1, fill_value = 0)
+cleaned_statcast_data['Season_OutZone%'] = (cleaned_statcast_data['Season_OutZone'] / cleaned_statcast_data['Season_Pitches']).fillna(0)
+
+#Outside the Zone Swing Percentage Swings at pitches outside the zone divided by pitches outside the zone
+cleaned_statcast_data['Season_O-Swing'] = cleaned_statcast_data.groupby(['playerid', 'season'])['O-Swing'].cumsum()
+cleaned_statcast_data['Season_O-Swing'] = cleaned_statcast_data.groupby(['playerid', 'season'])['Season_O-Swing'].shift(1, fill_value = 0)
+cleaned_statcast_data['Season_O-Swing%'] = (cleaned_statcast_data['Season_O-Swing'] / cleaned_statcast_data['Season_OutZone']).fillna(0)
+
+#Inside the Zone Swing Percentage Swings at pitches inside the zone divided by pitches inside the zone
+cleaned_statcast_data['Season_Z-Swing'] = cleaned_statcast_data.groupby(['playerid', 'season'])['Z-Swing'].cumsum()
+cleaned_statcast_data['Season_Z-Swing'] = cleaned_statcast_data.groupby(['playerid', 'season'])['Season_Z-Swing'].shift(1, fill_value = 0)
+cleaned_statcast_data['Season_Z-Swing%'] = (cleaned_statcast_data['Season_Z-Swing'] / cleaned_statcast_data['Season_InZone']).fillna(0)
+
+#Outside the Zone Contact Percentage Contact made outside the zone divided by swings outside the zone
+cleaned_statcast_data['Season_O-Contact'] = cleaned_statcast_data.groupby(['playerid', 'season'])['O-Contact'].cumsum()
+cleaned_statcast_data['Season_O-Contact'] = cleaned_statcast_data.groupby(['playerid', 'season'])['Season_O-Contact'].shift(1, fill_value = 0)
+cleaned_statcast_data['Season_O-Contact%'] = (cleaned_statcast_data['Season_O-Contact'] / cleaned_statcast_data['Season_O-Swing']).fillna(0)
+
+#Inside the Zone Contact Percentage Contact made inside the zone divided by swings inside the zone
+cleaned_statcast_data['Season_Z-Contact'] = cleaned_statcast_data.groupby(['playerid', 'season'])['Z-Contact'].cumsum()
+cleaned_statcast_data['Season_Z-Contact'] = cleaned_statcast_data.groupby(['playerid', 'season'])['Season_Z-Contact'].shift(1, fill_value = 0)
+cleaned_statcast_data['Season_Z-Contact%'] = (cleaned_statcast_data['Season_Z-Contact'] / cleaned_statcast_data['Season_Z-Swing']).fillna(0)
+
+#Inside the Zone Contact Percentage Contact made inside the zone divided by swings inside the zone
+cleaned_statcast_data['Season_F-Strike'] = cleaned_statcast_data.groupby(['playerid', 'season'])['F-Strike'].cumsum()
+cleaned_statcast_data['Season_F-Strike'] = cleaned_statcast_data.groupby(['playerid', 'season'])['Season_F-Strike'].shift(1, fill_value = 0)
+cleaned_statcast_data['Season_F-Strike%'] = (cleaned_statcast_data['Season_F-Strike'] / cleaned_statcast_data['Season_TBF']).fillna(0)
+
 #Calculate Season rates for each pitch type
 cleaned_statcast_data['Season_Fastballs'] = cleaned_statcast_data.groupby(['playerid', 'season'])['Fastballs'].cumsum()
 cleaned_statcast_data['Season_Fastballs'] = cleaned_statcast_data.groupby(['playerid', 'season'])['Season_Fastballs'].shift(1, fill_value = 0)
@@ -336,7 +397,7 @@ cleaned_statcast_data['Season_Hard%'] = (cleaned_statcast_data['Season_Hard'] / 
 
 
 #Check to make sure the Season Wins are calculating correctly
-cols_to_check = ['PlayerName', 'playerid', 'Date', 'Pull', 'bipCount', 'Season_Pull', 'Season_bipCount', 'Season_Pull%']
+cols_to_check = ['PlayerName', 'playerid', 'Date', 'F-Strike%', 'TBF', 'F-Strike']
 checking_W = cleaned_statcast_data[cols_to_check]
 checking_W = checking_W[checking_W['playerid'] == 2036]
 
